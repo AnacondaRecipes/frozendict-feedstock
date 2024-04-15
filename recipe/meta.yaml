@@ -1,6 +1,6 @@
 {% set name = "frozendict" %}
-{% set version = "2.3.4" %}
-{% set sha256 = "15b4b18346259392b0d27598f240e9390fafbff882137a9c48a1e0104fb17f78" %}
+{% set version = "2.4.2" %}
+{% set sha256 = "741779e1d1a2e6bb2c623f78423bd5d14aad35dc0c57e6ccc89e54eaab5f1b8a" %}
 
 package:
   name: {{ name|lower }}
@@ -8,32 +8,41 @@ package:
 
 source:
   fn: {{ name }}-{{ version }}.tar.gz
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
   sha256: {{ sha256 }}
 
 build:
   number: 0
+  script: python -m pip install . --no-deps --no-build-isolation -v
+  script_env:
+   - CIBUILDWHEEL=1  # [py<311]
+   - FROZENDICT_PURE_PY=1  # [py>=311]
 
-outputs:
-  - name: {{ name }}
-    build:
-      script: python -m pip install . --no-deps -vv
+requirements:
+  build:
+    - {{ compiler('c') }}  # [py<311]
+  host:
+    - pip
+    - python
+    - setuptools
+    - wheel
 
-    requirements:
-      build:
-        - {{ compiler('c') }}
-      host:
-        - pip
-        - python
-        - setuptools
-        - wheel
+  run:
+    - python
 
-      run:
-        - python
-
-    test:
-      imports:
-        - frozendict
+test:
+  source_files:
+    - test
+  imports:
+    - frozendict
+    - frozendict._frozendict  # [py<311]
+  requires:
+    - pip
+    - pytest
+  commands:
+    - pip check
+    - python test/debug.py  # [py<311]
+    - pytest -v test
 
 about:
   home: https://github.com/Marco-Sulla/python-frozendict
@@ -41,7 +50,9 @@ about:
   license_family: LGPL
   license_file: LICENSE.txt
   summary: An immutable dictionary
+  description: frozendict is a simple immutable dictionary. It's fast as dict, and sometimes faster!
   dev_url: https://github.com/Marco-Sulla/python-frozendict
+  doc_url: https://github.com/Marco-Sulla/python-frozendict
 
 extra:
   recipe-maintainers:
