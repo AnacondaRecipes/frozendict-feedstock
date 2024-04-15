@@ -1,6 +1,6 @@
 {% set name = "frozendict" %}
-{% set version = "2.3.4" %}
-{% set sha256 = "15b4b18346259392b0d27598f240e9390fafbff882137a9c48a1e0104fb17f78" %}
+{% set version = "2.4.2" %}
+{% set sha256 = "741779e1d1a2e6bb2c623f78423bd5d14aad35dc0c57e6ccc89e54eaab5f1b8a" %}
 
 package:
   name: {{ name|lower }}
@@ -8,32 +8,28 @@ package:
 
 source:
   fn: {{ name }}-{{ version }}.tar.gz
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
   sha256: {{ sha256 }}
 
 build:
+  script: python -m pip install . --no-deps -vv
   number: 0
 
-outputs:
-  - name: {{ name }}
-    build:
-      script: python -m pip install . --no-deps -vv
+requirements:
+  build:
+    - {{ compiler('c') }}
+  host:
+    - pip
+    - python
+    - setuptools
+    - wheel
 
-    requirements:
-      build:
-        - {{ compiler('c') }}
-      host:
-        - pip
-        - python
-        - setuptools
-        - wheel
+  run:
+    - python
 
-      run:
-        - python
-
-    test:
-      imports:
-        - frozendict
+test:
+  imports:
+    - frozendict
 
 about:
   home: https://github.com/Marco-Sulla/python-frozendict
