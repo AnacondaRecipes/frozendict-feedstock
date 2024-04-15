@@ -12,14 +12,15 @@ source:
   sha256: {{ sha256 }}
 
 build:
-  script: python -m pip install . --no-deps -vv
   number: 0
+  script: python -m pip install . --no-deps --no-build-isolation -v
   script_env:
-   - CIBUILDWHEEL=1
+   - CIBUILDWHEEL=1  # [py<311]
+   - FROZENDICT_PURE_PY=1  # [py>=311]
 
 requirements:
   build:
-    - {{ compiler('c') }}
+    - {{ compiler('c') }}  # [py<311]
   host:
     - pip
     - python
@@ -30,8 +31,18 @@ requirements:
     - python
 
 test:
+  source_files:
+    - test
   imports:
     - frozendict
+    - frozendict._frozendict  # [py<311]
+  requires:
+    - pip
+    - pytest
+  commands:
+    - pip check
+    - python test/debug.py  # [py<311]
+    - pytest -v test
 
 about:
   home: https://github.com/Marco-Sulla/python-frozendict
