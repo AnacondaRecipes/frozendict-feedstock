@@ -1,6 +1,6 @@
 {% set name = "frozendict" %}
-{% set version = "2.4.2" %}
-{% set sha256 = "741779e1d1a2e6bb2c623f78423bd5d14aad35dc0c57e6ccc89e54eaab5f1b8a" %}
+{% set version = "2.4.6" %}
+{% set sha256 = "df7cd16470fbd26fc4969a208efadc46319334eb97def1ddf48919b351192b8e" %}
 
 package:
   name: {{ name|lower }}
@@ -15,18 +15,17 @@ build:
   number: 0
   script: python -m pip install . --no-deps --no-build-isolation -v
   script_env:
-   - CIBUILDWHEEL=1  # [py<311]
-   - FROZENDICT_PURE_PY=1  # [py>=311]
+    - CIBUILDWHEEL=1  # [py<311]
+    - FROZENDICT_PURE_PY=1  # [py>=311]
 
 requirements:
   build:
-    - {{ compiler('c') }}  # [py<311]
+    - {{ compiler('c') }}
   host:
     - pip
     - python
     - setuptools
     - wheel
-
   run:
     - python
 
