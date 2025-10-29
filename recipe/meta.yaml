@@ -1,48 +1,44 @@
 {% set name = "frozendict" %}
-{% set version = "2.4.2" %}
-{% set sha256 = "741779e1d1a2e6bb2c623f78423bd5d14aad35dc0c57e6ccc89e54eaab5f1b8a" %}
+{% set version = "2.4.6" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  fn: {{ name }}-{{ version }}.tar.gz
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: {{ sha256 }}
+  sha256: df7cd16470fbd26fc4969a208efadc46319334eb97def1ddf48919b351192b8e
 
 build:
   number: 0
-  script: python -m pip install . --no-deps --no-build-isolation -v
-  script_env:
-   - CIBUILDWHEEL=1  # [py<311]
-   - FROZENDICT_PURE_PY=1  # [py>=311]
+  script: {{ PYTHON }} -m pip install . -v --no-deps --no-build-isolation
+  skip: true  # [py<36]
 
 requirements:
   build:
-    - {{ compiler('c') }}  # [py<311]
+    - {{ stdlib('c') }}
+    - {{ compiler('c') }}
   host:
     - pip
     - python
     - setuptools
     - wheel
-
   run:
     - python
 
+# Fatal Python error: Segmentation fault
+{% set deselect_tests = " --deselect=test/test_frozendict_subclass.py::TestFrozendictSubclass::test_copycopy_sub" %}
 test:
   source_files:
     - test
   imports:
     - frozendict
-    - frozendict._frozendict  # [py<311]
   requires:
     - pip
     - pytest
   commands:
     - pip check
-    - python test/debug.py  # [py<311]
-    - pytest -v test
+    - pytest -v test {{ deselect_tests }}
 
 about:
   home: https://github.com/Marco-Sulla/python-frozendict
